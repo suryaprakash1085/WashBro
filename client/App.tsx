@@ -17,6 +17,8 @@ const AdminDashboard = lazy(() => import('@/pages/admin/Dashboard'));
 const AdminOrders = lazy(() => import('@/pages/admin/Orders'));
 const AdminCustomers = lazy(() => import('@/pages/admin/Customers'));
 const AdminServicesPage = lazy(() => import('@/pages/admin/AdminServices'));
+const AdminHomepage = lazy(() => import('@/pages/admin/Homepage'));
+const AdminAbout = lazy(() => import('@/pages/admin/About'));
 const AdminMessages = lazy(() => import('@/pages/admin/Messages'));
 const AdminReports = lazy(() => import('@/pages/admin/Reports'));
 const AdminSettings = lazy(() => import('@/pages/admin/Settings'));
@@ -34,7 +36,8 @@ function PageLoader() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    // <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <BrowserRouter>
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route element={<UserLayout />}>
@@ -50,6 +53,8 @@ export default function App() {
 
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
+            <Route path="homepage" element={<AdminHomepage />} />
+            <Route path="about" element={<AdminAbout />} />
             <Route path="orders" element={<AdminOrders />} />
             <Route path="customers" element={<AdminCustomers />} />
             <Route path="services" element={<AdminServicesPage />} />
