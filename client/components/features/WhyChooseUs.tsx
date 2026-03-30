@@ -1,5 +1,7 @@
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 import { Shield, Clock, Leaf, Heart, Award, Headphones } from 'lucide-react';
+import { motion } from 'framer-motion';
+import AnimatedIcon from '@/components/AnimatedIcon';
 
 const features = [
   { icon: Shield, title: 'Fabric Safe', description: 'We use gentle, premium detergents that are safe for all fabric types.' },
@@ -25,19 +27,30 @@ export default function WhyChooseUs() {
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f, i) => (
-            <div
+            <motion.div
               key={i}
               data-reveal
-              className={`stagger-${i + 1} flex gap-4 rounded-2xl border bg-white p-6 transition-all duration-300 hover:shadow-md hover:shadow-primary/5`}
+              className={`stagger-${i + 1} flex gap-4 rounded-2xl border bg-white p-6 cursor-pointer group`}
+              whileHover={{
+                boxShadow: '0 12px 24px rgba(20, 184, 166, 0.1)',
+                y: -4,
+              }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
             >
-              <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <f.icon className="size-5" />
-              </div>
+              <motion.div
+                className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors duration-300 group-hover:bg-primary group-hover:text-white"
+                whileHover={{ rotate: 360 }}
+                transition={{ duration: 0.6, ease: 'easeOut' }}
+              >
+                <AnimatedIcon animation="bounce" hoverAnimation="spin">
+                  <f.icon className="size-5" />
+                </AnimatedIcon>
+              </motion.div>
               <div>
                 <h3 className="mb-1 font-[Outfit] text-base font-semibold text-foreground">{f.title}</h3>
                 <p className="text-sm leading-relaxed text-muted-foreground">{f.description}</p>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

@@ -5,6 +5,8 @@ import { WashingMachine, Flame, Sparkles, Wind, Footprints, Bed, Droplets, Zap, 
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import PageTransition from '@/components/PageTransition';
+import AnimatedIcon from '@/components/AnimatedIcon';
 
 const iconMap: Record<string, React.ElementType> = { WashingMachine, Flame, Sparkles, Wind, Footprints, Bed, Droplets, Zap };
 
@@ -14,7 +16,7 @@ export default function Services() {
   const navigate = useNavigate();
 
   return (
-    <>
+    <PageTransition>
       <section className="hero-gradient py-16 lg:py-20">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="mx-auto max-w-3xl text-center">
@@ -41,7 +43,9 @@ export default function Services() {
                   className={`stagger-${(i % 6) + 1} group relative flex flex-col overflow-hidden rounded-2xl border bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5`}
                 >
                   <div className="mb-5 flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-white group-hover:scale-110">
-                    <Icon className="size-7" />
+                    <AnimatedIcon animation="bounce" hoverAnimation="spin">
+                      <Icon className="size-7" />
+                    </AnimatedIcon>
                   </div>
                   <span className="mb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">{svc.category}</span>
                   <h3 className="mb-2 font-[Outfit] text-xl font-semibold text-foreground">{svc.title}</h3>
@@ -56,7 +60,7 @@ export default function Services() {
                       onClick={() => navigate('/booking')}
                       className="rounded-full px-5"
                     >
-                      Book <ArrowRight className="ml-1 size-3.5" />
+                      Book <AnimatedIcon animation="none" hoverAnimation="bounce" className="ml-1"><ArrowRight className="size-3.5" /></AnimatedIcon>
                     </Button>
                   </div>
                 </div>
@@ -65,6 +69,6 @@ export default function Services() {
           </div>
         </div>
       </section>
-    </>
+    </PageTransition>
   );
 }

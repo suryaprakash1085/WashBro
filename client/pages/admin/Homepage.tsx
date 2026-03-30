@@ -1,92 +1,120 @@
 import { useState } from 'react';
-import { useOrderStore } from '@/stores/orderStore';
-import { motion } from 'framer-motion';
-import { Search, Trash2 } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { useHomepageStore } from '@/stores/homepageStore';
+import AdminModal from '@/components/admin/AdminModal';
+import AdminCard from '@/components/admin/AdminCard';
+import FormField from '@/components/admin/FormField';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { motion } from 'framer-motion';
+import { Edit2, Save } from 'lucide-react';
 
-
-export default function AdminOrders() {
-  const { orders, updateStatus, deleteOrder } = useOrderStore();
+export default function AdminHomepage() {
+  const { content, updateContent } = useHomepageStore();
   const { toast } = useToast();
-  const [search, setSearch] = useState('');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [page, setPage] = useState(1);
-  const perPage = 10;
+  const [showModal, setShowModal] = useState(false);
+  const [editingField, setEditingField] = useState<string | null>(null);
+  const [formData, setFormData] = useState(content);
 
-  const filtered = orders
-    .filter(o => filterStatus === 'all' || o.status === filterStatus)
-    .filter(o => !search || o.id.toLowerCase().includes(search.toLowerCase()) || o.userName.toLowerCase().includes(search.toLowerCase()) || o.service.toLowerCase().includes(search.toLowerCase()));
-
-  const totalPages = Math.ceil(filtered.length / perPage);
-  const paginated = filtered.slice((page - 1) * perPage, page * perPage);
-
-  const handleDelete = (id: string) => {
-    deleteOrder(id);
-    toast({ variant: 'destructive', title: 'Order deleted', description: `Order ${id} has been removed.` });
+  const handleEdit = (field: string) => {
+    setEditingField(field);
+    setFormData(content);
+    setShowModal(true);
   };
 
+  const handleSave = () => {
+    updateContent(formData);
+    setShowModal(false);
+    toast({ title: 'Content updated', description: 'Homepage content has been saved.' });
+  };
+
+  const sections = [
+    {
+      title: 'Hero Section',
+      fields: [
+        { key: 'heroTitle', label: 'Hero Title' },
+        { key: 'heroSubtitle', label: 'Hero Subtitle' },
+      ],
+    },
+    {
+      title: 'Promotions',
+      fields: [{ key: 'offerBanner', label: 'Offer Banner' }],
+    },
+    {
+      title: 'Services Section',
+      fields: [
+        { key: 'servicesTitle', label: 'Services Title' },
+        { key: 'servicesSubtitle', label: 'Services Subtitle' },
+      ],
+    },
+    {
+      title: 'Call to Action',
+      fields: [{ key: 'ctaText', label: 'CTA Text' }],
+    },
+  ];
+
   return (
-    <div className="space-y-5">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative max-w-sm flex-1">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Search orders..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} className="pl-9" />
-        </div>
-       
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="font-[Outfit] text-lg font-semibold">Homepage Content</h2>
+        <p className="text-sm text-muted-foreground">Manage your homepage sections</p>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border bg-white shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b bg-slate-50/80">
-                <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Page</th>
-                <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Key</th>
-                <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Value</th>
-                <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginated.map((order, i) => (
-                <motion.tr
-                  key={order.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: i * 0.03 }}
-                  className="border-b last:border-0 transition-colors hover:bg-slate-50/50"
+      <div className="grid gap-6 lg:grid-cols-2">
+        {sections.map((section, i) => (
+          <AdminCard key={section.title} title={section.title} delay={i * 0.08}>
+            <div className="space-y-4">
+              {section.fields.map(field => (
+                <motion.div
+                  key={field.key}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="flex items-start justify-between gap-3 rounded-lg bg-slate-50 p-3"
                 >
-                  <td className="px-4 py-3 font-mono text-xs font-semibold text-primary">{order.id}</td>
-                  <td className="px-4 py-3">
-                    <p className="font-medium">{order.userName}</p>
-                    <p className="text-xs text-muted-foreground">{order.userEmail}</p>
-                  </td>
-                  <td className="px-4 py-3">{order.service}</td>
-                 
-                 <td className="px-4 py-3 text-right">
-                    <Button variant="ghost" size="icon" onClick={() => handleDelete(order.id)} className="size-8 text-destructive hover:text-destructive">
-                      <Trash2 className="size-3.5" />
-                    </Button>
-                  </td>
-                </motion.tr>
+                  <div className="flex-1">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      {field.label}
+                    </p>
+                    <p className="mt-2 text-sm text-foreground line-clamp-2">
+                      {(content as any)[field.key]}
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-8"
+                    onClick={() => handleEdit(field.key)}
+                  >
+                    <Edit2 className="size-3.5" />
+                  </Button>
+                </motion.div>
               ))}
-            </tbody>
-          </table>
-        </div>
-
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between border-t px-4 py-3">
-            <p className="text-xs text-muted-foreground">Showing {((page - 1) * perPage) + 1}–{Math.min(page * perPage, filtered.length)} of {filtered.length}</p>
-            <div className="flex gap-1">
-              <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(p => p - 1)}>Prev</Button>
-              <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(p => p + 1)}>Next</Button>
             </div>
-          </div>
-        )}
-
-        
+          </AdminCard>
+        ))}
       </div>
+
+      <AdminModal
+        open={showModal}
+        title={`Edit ${editingField === 'heroTitle' ? 'Hero Title' : editingField === 'heroSubtitle' ? 'Hero Subtitle' : editingField?.replace(/([A-Z])/g, ' $1').trim()}`}
+        onClose={() => setShowModal(false)}
+        onSubmit={handleSave}
+        submitLabel="Save Changes"
+      >
+        {editingField && (
+          <FormField
+            label={`${editingField?.replace(/([A-Z])/g, ' $1').trim()}`}
+            type={editingField?.includes('Subtitle') || editingField?.includes('Description') ? 'textarea' : 'text'}
+            value={(formData as any)[editingField] || ''}
+            onChange={value =>
+              setFormData(prev => ({
+                ...prev,
+                [editingField]: value,
+              }))
+            }
+            rows={editingField?.includes('Subtitle') || editingField?.includes('Description') ? 4 : undefined}
+          />
+        )}
+      </AdminModal>
     </div>
   );
 }

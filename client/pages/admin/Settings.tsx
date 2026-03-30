@@ -23,13 +23,6 @@ export default function AdminSettings() {
   };
 
   const sections = [
-    { icon: Type, title: 'Hero Section', fields: [
-      { key: 'heroTitle', label: 'Hero Title', type: 'input' },
-      { key: 'heroSubtitle', label: 'Hero Subtitle', type: 'textarea' },
-    ]},
-    { icon: Tag, title: 'Promotions', fields: [
-      { key: 'offerText', label: 'Offer Banner Text', type: 'input' },
-    ]},
     { icon: Palette, title: 'Theme', fields: [
       { key: 'themeColor', label: 'Primary Color', type: 'color' },
     ]},

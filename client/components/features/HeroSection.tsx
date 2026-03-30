@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
+import AnimatedIcon from '@/components/AnimatedIcon';
 import heroImg from '@/assets/hero-laundry.jpg';
 
 export default function HeroSection() {
@@ -22,7 +23,10 @@ export default function HeroSection() {
             transition={{ duration: 0.6, ease: 'easeOut' }}
           >
             <div className="mb-4 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-              <Sparkles className="size-3" /> Trusted by 10,000+ Customers
+              <AnimatedIcon animation="pulse" hoverAnimation="scale">
+                <Sparkles className="size-3" />
+              </AnimatedIcon>
+              Trusted by 10,000+ Customers
             </div>
             <h1 className="font-[Outfit] text-4xl font-extrabold leading-[1.1] tracking-tight text-foreground sm:text-5xl lg:text-[3.5rem]">
               Quality Laundry{' '}
@@ -46,22 +50,36 @@ export default function HeroSection() {
             transition={{ duration: 0.5, delay: 0.3 }}
             className="flex flex-wrap gap-3"
           >
-            <Button
-              size="lg"
-              onClick={() => navigate('/booking')}
-              className="group rounded-full px-7 text-base font-semibold shadow-lg shadow-primary/25 transition-all duration-200 hover:shadow-xl hover:shadow-primary/30"
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.2 }}
             >
-              Book Now
-              <ArrowRight className="ml-1 size-4 transition-transform duration-200 group-hover:translate-x-1" />
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={() => navigate('/services')}
-              className="rounded-full px-7 text-base font-semibold"
+              <Button
+                size="lg"
+                onClick={() => navigate('/booking')}
+                className="group rounded-full px-7 text-base font-semibold shadow-lg shadow-primary/25 transition-all duration-200 hover:shadow-xl hover:shadow-primary/30"
+              >
+                Book Now
+                <AnimatedIcon animation="none" hoverAnimation="bounce" className="ml-1">
+                  <ArrowRight className="size-4" />
+                </AnimatedIcon>
+              </Button>
+            </motion.div>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.2 }}
             >
-              View Services
-            </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => navigate('/services')}
+                className="rounded-full px-7 text-base font-semibold"
+              >
+                View Services
+              </Button>
+            </motion.div>
           </motion.div>
 
           <motion.div
@@ -106,7 +124,9 @@ export default function HeroSection() {
           >
             <div className="flex items-center gap-3">
               <div className="flex size-10 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
-                <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                <AnimatedIcon animation="bounce" hoverAnimation="scale">
+                  <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                </AnimatedIcon>
               </div>
               <div>
                 <p className="text-sm font-bold text-foreground">Free Pickup</p>

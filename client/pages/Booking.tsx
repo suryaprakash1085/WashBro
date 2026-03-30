@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import PageTransition from '@/components/PageTransition';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,6 +12,7 @@ import { useOrderStore } from '@/stores/orderStore';
 import { useAuthStore } from '@/stores/authStore';
 import { generateOrderId } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import AnimatedIcon from '@/components/AnimatedIcon';
 import { CheckCircle2, CalendarDays, ArrowLeft } from 'lucide-react';
 
 export default function Booking() {
@@ -82,11 +84,13 @@ export default function Booking() {
   };
 
   return (
-    <>
+    <PageTransition>
       <section className="hero-gradient py-16 lg:py-20">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mx-auto max-w-3xl text-center">
-            <CalendarDays className="mx-auto mb-3 size-10 text-primary" />
+            <AnimatedIcon animation="float" hoverAnimation="scale" className="mx-auto mb-3 text-primary">
+              <CalendarDays className="size-10" />
+            </AnimatedIcon>
             <h1 className="font-[Outfit] text-4xl font-bold text-foreground">Book a <span className="gradient-text">Pickup</span></h1>
             <p className="mt-3 text-muted-foreground">Fill out the form below and we will schedule your laundry pickup.</p>
           </motion.div>
@@ -104,7 +108,9 @@ export default function Booking() {
                 className="rounded-2xl border bg-white p-10 text-center shadow-lg"
               >
                 <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-emerald-100">
-                  <CheckCircle2 className="size-8 text-emerald-600" />
+                  <AnimatedIcon animation="bounce" hoverAnimation="scale" className="text-emerald-600">
+                    <CheckCircle2 className="size-8" />
+                  </AnimatedIcon>
                 </div>
                 <h2 className="mb-2 font-[Outfit] text-2xl font-bold">Booking Confirmed!</h2>
                 <p className="mb-1 text-muted-foreground">Your order has been placed successfully.</p>
@@ -191,6 +197,6 @@ export default function Booking() {
           </AnimatePresence>
         </div>
       </section>
-    </>
+    </PageTransition>
   );
 }

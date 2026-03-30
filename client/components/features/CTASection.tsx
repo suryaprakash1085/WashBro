@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
+import { useEffect, useRef } from 'react';
+import gsap from 'gsap';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Phone } from 'lucide-react';
 import { APP_CONFIG } from '@/constants/config';
@@ -7,6 +9,25 @@ import { APP_CONFIG } from '@/constants/config';
 export default function CTASection() {
   const ref = useScrollReveal<HTMLDivElement>();
   const navigate = useNavigate();
+  const bgBallsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!bgBallsRef.current) return;
+
+    const balls = bgBallsRef.current.querySelectorAll('.gradient-ball');
+
+    balls.forEach((ball, i) => {
+      const duration = 8 + i * 2;
+      gsap.to(ball, {
+        x: Math.random() * 40 - 20,
+        y: Math.random() * 40 - 20,
+        duration,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+      });
+    });
+  }, []);
 
   return (
     <section className="py-20 lg:py-28">
@@ -15,8 +36,10 @@ export default function CTASection() {
           data-reveal
           className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-blue-600 to-blue-700 px-6 py-16 text-center text-white sm:px-12 lg:py-20"
         >
-          <div className="absolute -left-20 -top-20 size-72 rounded-full bg-white/10 blur-3xl" />
-          <div className="absolute -bottom-20 -right-20 size-72 rounded-full bg-orange-400/10 blur-3xl" />
+          <div ref={bgBallsRef}>
+            <div className="gradient-ball absolute -left-20 -top-20 size-72 rounded-full bg-white/10 blur-3xl" />
+            <div className="gradient-ball absolute -bottom-20 -right-20 size-72 rounded-full bg-orange-400/10 blur-3xl" />
+          </div>
 
           <div className="relative">
             <h2 className="mb-4 font-[Outfit] text-3xl font-bold sm:text-4xl lg:text-5xl">

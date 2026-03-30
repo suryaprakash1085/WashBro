@@ -2,6 +2,8 @@ import { useScrollReveal } from '@/hooks/useScrollReveal';
 import { MOCK_TEAM } from '@/constants/mockData';
 import { Target, Eye, Heart, Award } from 'lucide-react';
 import { motion } from 'framer-motion';
+import PageTransition from '@/components/PageTransition';
+import AnimatedIcon from '@/components/AnimatedIcon';
 import aboutImg from '@/assets/about-process.jpg';
 import vanImg from '@/assets/delivery-van.jpg';
 
@@ -26,7 +28,7 @@ export default function About() {
   const ref4 = useScrollReveal<HTMLDivElement>();
 
   return (
-    <>
+    <PageTransition>
       <section className="hero-gradient py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <motion.div
@@ -69,7 +71,9 @@ export default function About() {
             {values.map((v, i) => (
               <div key={i} data-reveal className={`stagger-${i + 1} rounded-2xl border bg-white p-8 transition-all hover:shadow-md`}>
                 <div className="mb-4 flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                  <v.icon className="size-6" />
+                  <AnimatedIcon animation="bounce" hoverAnimation="spin">
+                    <v.icon className="size-6" />
+                  </AnimatedIcon>
                 </div>
                 <h3 className="mb-2 font-[Outfit] text-xl font-semibold">{v.title}</h3>
                 <p className="text-sm leading-relaxed text-muted-foreground">{v.text}</p>
@@ -129,6 +133,6 @@ export default function About() {
           </div>
         </div>
       </section>
-    </>
+    </PageTransition>
   );
 }

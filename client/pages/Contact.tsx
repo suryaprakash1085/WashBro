@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import PageTransition from '@/components/PageTransition';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,6 +9,7 @@ import { useMessageStore } from '@/stores/messageStore';
 import { useToast } from '@/hooks/use-toast';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 import { APP_CONFIG } from '@/constants/config';
+import AnimatedIcon from '@/components/AnimatedIcon';
 import { MapPin, Phone, Mail, Clock, Send } from 'lucide-react';
 
 export default function Contact() {
@@ -50,7 +52,7 @@ export default function Contact() {
   ];
 
   return (
-    <>
+    <PageTransition>
       <section className="hero-gradient py-16 lg:py-20">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="mx-auto max-w-3xl text-center">
@@ -74,7 +76,9 @@ export default function Contact() {
                 {info.map((item, i) => (
                   <div key={i} className="flex items-start gap-4 rounded-xl border bg-white p-4 transition-all hover:shadow-sm">
                     <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                      <item.icon className="size-5" />
+                      <AnimatedIcon animation="bounce" hoverAnimation="spin">
+                        <item.icon className="size-5" />
+                      </AnimatedIcon>
                     </div>
                     <div>
                       <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{item.label}</p>
@@ -102,7 +106,9 @@ export default function Contact() {
               {sent ? (
                 <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center rounded-2xl border bg-white p-12 text-center shadow-sm">
                   <div className="mb-4 flex size-16 items-center justify-center rounded-full bg-emerald-100">
-                    <Send className="size-7 text-emerald-600" />
+                    <AnimatedIcon animation="bounce" hoverAnimation="scale" className="text-emerald-600">
+                      <Send className="size-7" />
+                    </AnimatedIcon>
                   </div>
                   <h3 className="mb-2 font-[Outfit] text-xl font-bold">Message Sent!</h3>
                   <p className="mb-6 text-muted-foreground">Thank you for reaching out. We'll respond within 24 hours.</p>
@@ -133,7 +139,7 @@ export default function Contact() {
                     {errors.message && <p className="mt-1 text-xs text-destructive">{errors.message}</p>}
                   </div>
                   <Button type="submit" size="lg" className="w-full rounded-xl text-base font-semibold">
-                    <Send className="mr-2 size-4" /> Send Message
+                    <AnimatedIcon animation="none" hoverAnimation="bounce" className="mr-2"><Send className="size-4" /></AnimatedIcon> Send Message
                   </Button>
                 </form>
               )}
@@ -141,6 +147,6 @@ export default function Contact() {
           </div>
         </div>
       </section>
-    </>
+    </PageTransition>
   );
 }
