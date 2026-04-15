@@ -156,7 +156,7 @@ export function optionalAuth(req: Request, res: Response, next: NextFunction) {
  */
 const requestCounts = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMIT_WINDOW = 60000; // 1 minute
-const RATE_LIMIT_MAX_REQUESTS = 100;
+const RATE_LIMIT_MAX_REQUESTS = process.env.NODE_ENV === 'production' ? 100 : 10000; // Much higher limit in development
 
 export function rateLimitMiddleware(req: Request, res: Response, next: NextFunction) {
   const clientIp = req.ip || req.socket.remoteAddress || 'unknown';
@@ -212,19 +212,29 @@ export function loggingMiddleware(req: Request, res: Response, next: NextFunctio
 
 /**
  * Request Validation Middleware
- * Validates that request body exists for POST/PUT/PATCH
+ * Validates that request body exists for POST/PUT/PATCH (only for API routes)
  */
 export function validateRequestBody(req: Request, res: Response, next: NextFunction) {
-  if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
-    if (!req.body || Object.keys(req.body).length === 0) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          message: 'Request body is required',
-          status: 400,
-        },
-      });
-    }
+  // Skip validation for non-API routes
+  if (!req.path.startsWith('/api/')) {
+    return next();
+  }
+
+  // Skip validation for GET, DELETE and other methods
+  if (!['POST', 'PUT', 'PATCH'].includes(req.method)) {
+    return next();
+  }
+
+  // For some routes, empty body is acceptable (e.g., DELETE with just ID in params)
+  // Only enforce body requirement for specific routes that definitely need data
+  if (req.method === 'POST' && !req.body) {
+    return res.status(400).json({
+      success: false,
+      error: {
+        message: 'Request body is required',
+        status: 400,
+      },
+    });
   }
 
   next();
@@ -235,12 +245,24 @@ export function validateRequestBody(req: Request, res: Response, next: NextFunct
  * Allows cross-origin requests from specified origins
  */
 export const corsOptions = {
-  origin: [
-    'http://localhost:3000',
-    'http://localhost:5173',
-    'http://localhost:8080',
-    'http://localhost:9005',
-  ],
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:5173',
+      'http://localhost:8080',
+      'http://localhost:9005',
+      'http://localhost:9090',
+      'http://localhost:9091',
+      'http://192.168.31.223:9091',
+    ];
+
+    // Allow requests with no origin (mobile apps, curl requests, etc.)
+    if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],

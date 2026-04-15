@@ -52,6 +52,9 @@ export async function createServer() {
   const { servicesRouter } = await import("./routes/services.js");
   const { ordersRouter } = await import("./routes/orders.js");
   const { messagesRouter } = await import("./routes/messages.js");
+  const { settingsRouter } = await import("./routes/settings.js");
+  const { homepageRouter } = await import("./routes/homepage.js");
+  const { aboutRouter } = await import("./routes/about.js");
 
   // Register routes
   app.use("/api/auth", authRouter);
@@ -59,6 +62,9 @@ export async function createServer() {
   app.use("/api/services", servicesRouter);
   app.use("/api/orders", ordersRouter);
   app.use("/api/messages", messagesRouter);
+  app.use("/api/settings", settingsRouter);
+  app.use("/api/homepage", homepageRouter);
+  app.use("/api/about", aboutRouter);
 
   // 404 handler for unknown API routes
   app.use((req, res, next) => {
