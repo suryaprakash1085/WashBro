@@ -1,25 +1,108 @@
-import { useOrderStore } from '@/stores/orderStore';
-import { MOCK_USERS } from '@/constants/mockData';
-import { MONTHLY_REVENUE } from '@/constants/mockData';
-import StatsCard from '@/components/features/StatsCard';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Package, Clock, CheckCircle2, DollarSign, TrendingUp, Users } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import StatsCard from '@/components/features/StatsCard';
+import { apiFetch } from '@/hooks/useApi';
+import type { User, Order } from '@/types';
+
+interface Stats {
+  label: string;
+  value: number;
+  icon: React.ComponentType<{ className?: string }>;
+  color: string;
+  prefix: string;
+}
 
 export default function AdminDashboard() {
-  const orders = useOrderStore((s) => s.orders);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [monthlyData, setMonthlyData] = useState<{ month: string; revenue: number; orders: number }[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [ordersData, usersData] = await Promise.all([
+          apiFetch<Order[]>('/api/orders'),
+          apiFetch<User[]>('/api/users'),
+        ]);
+
+        setOrders(ordersData || []);
+        setUsers(usersData || []);
+
+        // Generate monthly data from orders
+        if (ordersData && ordersData.length > 0) {
+          const monthlyMap: Record<string, { revenue: number; count: number }> = {};
+          ordersData.forEach((order: any) => {
+            const date = new Date(order.created_at || new Date());
+            const month = date.toLocaleString('default', { month: 'short' });
+            if (!monthlyMap[month]) {
+              monthlyMap[month] = { revenue: 0, count: 0 };
+            }
+            monthlyMap[month].revenue += order.total_amount || order.price || 0;
+            monthlyMap[month].count += 1;
+          });
+
+          const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+          const data = months.map((month) => ({
+            month,
+            revenue: monthlyMap[month]?.revenue || 0,
+            orders: monthlyMap[month]?.count || 0,
+          }));
+          setMonthlyData(data);
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to fetch data';
+        setError(message);
+        console.error('Failed to fetch dashboard data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const totalOrders = orders.length;
-  const pending = orders.filter(o => o.status === 'Pending').length;
-  const delivered = orders.filter(o => o.status === 'Delivered').length;
-  const revenue = orders.reduce((sum, o) => sum + o.price, 0);
+  const pending = orders.filter((o: any) => o.status === 'pending' || o.status === 'Pending').length;
+  const delivered = orders.filter((o: any) => o.status === 'completed' || o.status === 'Delivered').length;
+  const revenue = orders.reduce((sum, o: any) => sum + (o.total_amount || o.price || 0), 0);
 
-  const stats = [
+  const stats: Stats[] = [
     { label: 'Total Orders', value: totalOrders, icon: Package, color: 'bg-blue-100 text-blue-600', prefix: '' },
     { label: 'Pending', value: pending, icon: Clock, color: 'bg-amber-100 text-amber-600', prefix: '' },
     { label: 'Delivered', value: delivered, icon: CheckCircle2, color: 'bg-emerald-100 text-emerald-600', prefix: '' },
     { label: 'Revenue', value: Math.round(revenue), icon: DollarSign, color: 'bg-purple-100 text-purple-600', prefix: '$' },
   ];
+
+  const chartData = monthlyData.length > 0 ? monthlyData : [
+    { month: 'Jan', revenue: 0, orders: 0 },
+    { month: 'Feb', revenue: 0, orders: 0 },
+    { month: 'Mar', revenue: 0, orders: 0 },
+  ];
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="size-10 animate-spin rounded-full border-4 border-muted border-t-primary" />
+          <p className="text-sm text-muted-foreground">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+        <p className="font-semibold">Error loading dashboard</p>
+        <p className="text-sm">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -44,7 +127,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <div className="mt-3 flex items-center gap-1 text-xs text-emerald-600">
-              <TrendingUp className="size-3" /> +12% from last month
+              <TrendingUp className="size-3" /> Real-time data
             </div>
           </motion.div>
         ))}
@@ -59,7 +142,7 @@ export default function AdminDashboard() {
         >
           <h3 className="mb-4 font-[Outfit] text-base font-semibold">Monthly Revenue</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={MONTHLY_REVENUE}>
+            <AreaChart data={chartData}>
               <defs>
                 <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="hsl(221, 83%, 53%)" stopOpacity={0.2} />
@@ -83,7 +166,7 @@ export default function AdminDashboard() {
         >
           <h3 className="mb-4 font-[Outfit] text-base font-semibold">Orders by Month</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={MONTHLY_REVENUE}>
+            <BarChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
               <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#94a3b8' }} />
               <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} />
@@ -101,7 +184,7 @@ export default function AdminDashboard() {
         className="rounded-2xl border bg-white shadow-sm"
       >
         <div className="border-b px-5 py-4">
-          <h3 className="font-[Outfit] text-base font-semibold flex items-center gap-2">
+          <h3 className="flex items-center gap-2 font-[Outfit] text-base font-semibold">
             <Users className="size-4 text-primary" /> Recent Customers
           </h3>
         </div>
@@ -112,19 +195,25 @@ export default function AdminDashboard() {
                 <th className="px-5 py-2.5 text-left font-semibold text-muted-foreground">Customer</th>
                 <th className="px-5 py-2.5 text-left font-semibold text-muted-foreground">Email</th>
                 <th className="px-5 py-2.5 text-left font-semibold text-muted-foreground">Phone</th>
-                <th className="px-5 py-2.5 text-left font-semibold text-muted-foreground">Joined</th>
+                <th className="px-5 py-2.5 text-left font-semibold text-muted-foreground">Role</th>
               </tr>
             </thead>
             <tbody>
-              {MOCK_USERS.slice(0, 5).map((u) => (
-                <tr key={u.id} className="border-b last:border-0 hover:bg-slate-50/50 transition-colors">
+              {users.filter((u: any) => u.role === 'customer').slice(0, 5).map((u: any) => (
+                <tr key={u.id} className="border-b last:border-0 transition-colors hover:bg-slate-50/50">
                   <td className="flex items-center gap-3 px-5 py-3">
-                    <img src={u.avatar} alt="" className="size-8 rounded-full object-cover" />
-                    <span className="font-medium">{u.name}</span>
+                    <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                      {u.name?.charAt(0) || 'U'}
+                    </div>
+                    <span className="font-medium">{u.name || 'N/A'}</span>
                   </td>
-                  <td className="px-5 py-3 text-muted-foreground">{u.email}</td>
-                  <td className="px-5 py-3 text-muted-foreground">{u.phone}</td>
-                  <td className="px-5 py-3 text-muted-foreground">{u.joinedDate}</td>
+                  <td className="px-5 py-3 text-muted-foreground">{u.email || 'N/A'}</td>
+                  <td className="px-5 py-3 text-muted-foreground">{u.phone || 'N/A'}</td>
+                  <td className="px-5 py-3">
+                    <span className="inline-block rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                      {u.role || 'customer'}
+                    </span>
+                  </td>
                 </tr>
               ))}
             </tbody>

@@ -14,20 +14,28 @@ export default function Login() {
   const [tab, setTab] = useState<'user' | 'admin'>(isAdminMode ? 'admin' : 'user');
   const [email, setEmail] = useState(isAdminMode ? 'admin@freshpress.com' : 'sarah@example.com');
   const [password, setPassword] = useState('password');
-  const { login, loginAsAdmin } = useAuthStore();
+  const { login, loginAsAdmin, loading } = useAuthStore();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (tab === 'admin') {
-      const ok = loginAsAdmin(email, password);
-      if (ok) { navigate('/admin'); toast({ title: 'Welcome back, Admin!' }); }
-      else toast({ variant: 'destructive', title: 'Invalid admin credentials', description: 'Use admin@freshpress.com' });
+      const ok = await loginAsAdmin(email, password);
+      if (ok) {
+        navigate('/admin');
+        toast({ title: 'Welcome back, Admin!' });
+      } else {
+        toast({ variant: 'destructive', title: 'Invalid admin credentials', description: 'Use admin@freshpress.com' });
+      }
     } else {
-      login(email, password);
-      navigate('/');
-      toast({ title: `Welcome, ${email.split('@')[0]}!` });
+      const ok = await login(email, password);
+      if (ok) {
+        navigate('/');
+        toast({ title: `Welcome, ${email.split('@')[0]}!` });
+      } else {
+        toast({ variant: 'destructive', title: 'Login failed', description: 'Please check your email and password' });
+      }
     }
   };
 
@@ -72,19 +80,19 @@ export default function Login() {
             <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
           </div>
 
-          {tab === 'admin' && (
+          {/* {tab === 'admin' && (
             <div className="rounded-lg bg-blue-50 p-3 text-xs text-blue-700">
               <strong>Demo:</strong> admin@freshpress.com / any password
             </div>
-          )}
-          {tab === 'user' && (
+          )} */}
+          {/* {tab === 'user' && (
             <div className="rounded-lg bg-blue-50 p-3 text-xs text-blue-700">
               <strong>Demo:</strong> sarah@example.com / any password (or use any email)
             </div>
-          )}
+          )} */}
 
-          <Button type="submit" size="lg" className="w-full rounded-xl text-base font-semibold">
-            {tab === 'admin' ? 'Sign In as Admin' : 'Sign In'}
+          <Button type="submit" size="lg" className="w-full rounded-xl text-base font-semibold" disabled={loading}>
+            {loading ? 'Signing in...' : (tab === 'admin' ? 'Sign In as Admin' : 'Sign In')}
           </Button>
         </form>
       </motion.div>
