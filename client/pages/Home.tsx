@@ -5,6 +5,7 @@ import WhyChooseUs from '@/components/features/WhyChooseUs';
 import Testimonials from '@/components/features/Testimonials';
 import CTASection from '@/components/features/CTASection';
 import PageTransition from '@/components/PageTransition';
+import WhatsAppFloat from '@/components/features/WhatsAppFloat';
 
 export default function Home() {
   return (
@@ -15,6 +16,7 @@ export default function Home() {
       <WhyChooseUs />
       <Testimonials />
       <CTASection />
+      <WhatsAppFloat />
     </PageTransition>
   );
 }

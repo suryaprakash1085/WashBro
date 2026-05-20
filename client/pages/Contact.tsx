@@ -11,7 +11,7 @@ import { useScrollReveal } from '@/hooks/useScrollReveal';
 import { APP_CONFIG } from '@/constants/config';
 import AnimatedIcon from '@/components/AnimatedIcon';
 import { MapPin, Phone, Mail, Clock, Send } from 'lucide-react';
-
+import WhatsAppFloat from '@/components/features/WhatsAppFloat';
 export default function Contact() {
   const addMessage = useMessageStore((s) => s.addMessage);
   const { toast } = useToast();
@@ -147,6 +147,7 @@ export default function Contact() {
           </div>
         </div>
       </section>
+      <WhatsAppFloat />
     </PageTransition>
   );
 }

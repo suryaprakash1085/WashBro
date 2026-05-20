@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import AnimatedIcon from '@/components/AnimatedIcon';
 import { CheckCircle2, CalendarDays } from 'lucide-react';
 import { apiFetch } from '@/hooks/useApi';
+import WhatsAppFloat from '@/components/features/WhatsAppFloat';
 
 export default function Booking() {
   const user = useAuthStore((s) => s.user);
@@ -282,6 +283,7 @@ export default function Booking() {
           </AnimatePresence>
         </div>
       </section>
+      <WhatsAppFloat />
     </PageTransition>
   );
 }

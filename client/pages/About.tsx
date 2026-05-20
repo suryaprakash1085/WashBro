@@ -6,6 +6,7 @@ import PageTransition from '@/components/PageTransition';
 import AnimatedIcon from '@/components/AnimatedIcon';
 import aboutImg from '@/assets/about-process.jpg';
 import vanImg from '@/assets/delivery-van.jpg';
+import WhatsAppFloat from '@/components/features/WhatsAppFloat';
 
 const timeline = [
   { year: '2018', title: 'Founded', text: 'FreshPress launched from a single laundromat in downtown San Francisco.' },
@@ -133,6 +134,7 @@ export default function About() {
           </div>
         </div>
       </section>
+      <WhatsAppFloat />
     </PageTransition>
   );
 }

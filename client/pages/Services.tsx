@@ -8,6 +8,7 @@ import PageTransition from '@/components/PageTransition';
 import AnimatedIcon from '@/components/AnimatedIcon';
 import { apiFetch } from '@/hooks/useApi';
 import { useToast } from '@/hooks/use-toast';
+import WhatsAppFloat from '@/components/features/WhatsAppFloat';
 
 const iconMap: Record<string, React.ElementType> = { WashingMachine, Flame, Sparkles, Wind, Footprints, Bed, Droplets, Zap };
 
@@ -122,6 +123,7 @@ export default function Services() {
           )}
         </div>
       </section>
+      <WhatsAppFloat />
     </PageTransition>
   );
 }

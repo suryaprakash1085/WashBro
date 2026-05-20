@@ -10,6 +10,8 @@ import { useNavigate } from 'react-router-dom';
 import { apiFetch } from '@/hooks/useApi';
 import { useToast } from '@/hooks/use-toast';
 import emptyImg from '@/assets/empty-orders.jpg';
+import WhatsAppFloat from '@/components/features/WhatsAppFloat';
+
 
 export default function MyOrders() {
   const user = useAuthStore((s) => s.user);
@@ -181,6 +183,7 @@ export default function MyOrders() {
           )}
         </div>
       </section>
+      <WhatsAppFloat />
     </>
   );
 }
